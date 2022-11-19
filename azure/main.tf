@@ -323,3 +323,30 @@ resource "azurerm_storage_blob" "example" {
   type                   = "Block"
   source                 = "some-local-file.zip"
 }
+
+resource "azurerm_resource_group" "bucket" {
+  name     = "bucket-resources"
+  location = "West Europe"
+}
+
+resource "azurerm_storage_account" "bucket" {
+  name                     = "bucketstoracc"
+  resource_group_name      = azurerm_resource_group.bucket.name
+  location                 = azurerm_resource_group.bucket.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_storage_container" "bucket" {
+  name                  = "content"
+  storage_account_name  = azurerm_storage_account.bucket.name
+  container_access_type = "private"
+}
+
+resource "azurerm_storage_blob" "bucket" {
+  name                   = "my-awesome-content.zip"
+  storage_account_name   = azurerm_storage_account.bucket.name
+  storage_container_name = azurerm_storage_container.bucket.name
+  type                   = "Block"
+  source                 = "some-local-file.zip"
+}
